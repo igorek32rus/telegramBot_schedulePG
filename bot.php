@@ -9,11 +9,11 @@
 
 
 	include('vendor/autoload.php');				// Подключаем библиотеку
-	use Telegram\Bot\Api; 
+	use Telegram\Bot\Api;
 
 	$telegram = new Api($BotToken);		// Устанавливаем токен, полученный у BotFather
 	$result = $telegram -> getWebhookUpdates();		// Передаем в переменную $result полную информацию о сообщении пользователя
-	
+
 	$text = $result["message"]["text"];						// Текст сообщения
 	$chat_id = $result["message"]["chat"]["id"];			// Уникальный идентификатор пользователя
 	$message_id = $result["message"]["message_id"];			// ID сообщения (возможно для пересылки)
@@ -51,9 +51,9 @@
 				$create = false;	// Если такой пользователь есть в БД, не создаём новую запись
 			}
 		}
-		
+
 		$stmt->closeCursor();
-				
+
 		if ($create) {		// Создаём запись в БД о user'e. По сути перед первым входом в бота
 			$sql = "INSERT INTO users SET chat_id='".$chat_id."', name='".$name."', first_name='".$first_name."', last_name='".$last_name."'";
 			$stm = $dbh->prepare($sql);
@@ -65,7 +65,7 @@
 		}
 
 		$stmt->closeCursor();
-		
+
 		$stmt = $dbh->query("SELECT user_id FROM notify WHERE user_id=".$chat_id);        // Проверяем, есть ли id этого userа
 
 		$create = true;
@@ -77,20 +77,20 @@
 		}
 
 		$stmt->closeCursor();
-				
+
 		if ($create) {		// Создаём запись в БД о user'e. По сути перед первым входом в бота
 			$sql = "INSERT INTO notify SET user_id='".$chat_id."', notify_tomorrow=1, notify_today=1, notify_updates=1";
 			$stm = $dbh->prepare($sql);
 			$stm->execute($values);
-		} 
-					
+		}
+
 		// Пишем в лог
 		date_default_timezone_set('Etc/GMT-3');
 		$date_time = date("d.m.y H:i:s");
 		$sql = "INSERT INTO log SET user_id='".$chat_id."', date_time='".$date_time."', action='".$text."'";
 		$stm = $dbh->prepare($sql);
 		$stm->execute($values);
-			
+
 		$dbh = null;
 	} catch (PDOException $e) {
 		print "Error!: " . $e->getMessage() . "<br/>";
@@ -114,18 +114,18 @@
 
 			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
 		} elseif ($text == "/st_on") {
-			
+
 			$reply = turnOnTomorrow($chat_id);
 
 			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
 		} elseif ($text == "/sd_off") {
 
-			$reply = turnOffToday($chat_id);			
+			$reply = turnOffToday($chat_id);
 
 			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
 		} elseif ($text == "/sd_on") {
-			
-			$reply = turnOnToday($chat_id);	
+
+			$reply = turnOnToday($chat_id);
 
 			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
 		} elseif ($text == "/su_off") {
@@ -134,7 +134,7 @@
 
 			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
 		} elseif ($text == "/su_on") {
-			
+
 			$reply = turnOnUpdates($chat_id);
 
 			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
@@ -163,7 +163,7 @@
 					}
 				}
 			}
-			
+
 			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
 		} elseif ($text == "Расписание на сегодня") {
 
@@ -172,7 +172,7 @@
 
 			if ($reply == "error") {
 				$reply = "К сожалению расписание на сегодня отсутствует...";
-				
+
 				if (date("N") != 7) {
 					$reply .= " Либо сайт с расписанием прилёг.";
 
@@ -213,7 +213,7 @@
 
 			include("includes/adminFunctions.php");
 			$reply = showLog($chat_id, $text);
-			
+
 			if ($reply == "error1") {
 				$reply = "А ты админ? Чёт не похож :)";
 			}
@@ -233,6 +233,50 @@
 
 			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
 
+		} elseif ((stripos($text, "/prep") !== false) && (stripos($text, "/prep") == 0)) {
+			$textMessage = $text;
+			$textMessage = substr($textMessage, 6);		// Убираем из текста "/prep "
+
+			if (mb_strlen($textMessage) >= 3) {
+				// To DB
+				try {
+					include("includes/settings.php");			// Подключаем настройки
+					$dbh = new PDO("mysql:host=".$DBhost.";dbname=".$DBname, $DBuser, $DBpass);
+
+					$sql = "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_general_ci'";
+					$stm = $dbh->prepare($sql);
+					$stm->execute($values);
+
+					$stmt = $dbh->query("SELECT * FROM employee WHERE fio LIKE '%$textMessage%'");
+
+					$search = $textMessage;
+					$textMessage = "<b>Результаты поиска по *".$textMessage."*:</b>\n";
+
+					$count = 0;
+					while ($row = $stmt->fetch())	// Рассылаем всем сообщение от админа
+					{
+						$textMessage .= "<a href=\"http://oreluniver.ru/employee/".$row['db_id']."\">".$row['fio']."</a>\n";
+						$count++;
+					}
+
+					if ($count == 0) {
+						$textMessage = "Поиск по *".$search."* не дал результатов...";
+					}
+
+					$dbh = null;
+				} catch (PDOException $e) {
+					print "Error!: " . $e->getMessage() . "<br/>";
+					die();
+				}
+				/********************************************/
+			} else {
+				$textMessage = "Ошибка! Минимальное количество символов для поиска - 3.";
+			}
+
+			$reply = $textMessage;
+
+			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
+
 		} elseif ((stripos($text, "/admin") !== false) && (stripos($text, "/admin") == 0)) {
 
 			include("includes/adminFunctions.php");
@@ -246,18 +290,18 @@
 				// To DB
 				try {
 					$dbh = new PDO("mysql:host=".$DBhost.";dbname=".$DBname, $DBuser, $DBpass);
-					
+
 					$sql = "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_general_ci'";
 					$stm = $dbh->prepare($sql);
 					$stm->execute($values);
-		
+
 					$stmt = $dbh->query('SELECT * FROM users');
 					while ($row = $stmt->fetch())	// Рассылаем всем сообщение от админа
 					{
 						$telegram->sendMessage([ 'chat_id' => $row['chat_id'], 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
 						usleep(333333);     // ждём 1/3 секунды и отправляем следующему
 					}
-						
+
 					$dbh = null;
 				} catch (PDOException $e) {
 					print "Error!: " . $e->getMessage() . "<br/>";
@@ -265,7 +309,7 @@
 				}
 				/********************************************/
 			}
-		
+
 		} else {
 			$reply = "По запросу \"<b>".$text."</b>\" ничего не найдено.";
 			$reply_markup = $telegram->replyKeyboardMarkup([ 'keyboard' => $keyboard, 'resize_keyboard' => true, 'one_time_keyboard' => false ]);
@@ -278,5 +322,5 @@
 		$telegram->sendMessage([ 'chat_id' => $chat_id, 'text' => $reply, 'parse_mode' => 'HTML', 'reply_markup' => $reply_markup ]);
 		//$telegram->sendMessage([ 'chat_id' => $chat_id, 'text' => "Отправьте текстовое сообщение." ]);
 	}
-	
+
 ?>

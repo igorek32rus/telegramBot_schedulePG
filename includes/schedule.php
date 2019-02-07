@@ -54,9 +54,9 @@
 			public $prepName 		= "";		// Name 				Имя препода
 			public $prepSecondName 	= "";		// SecondName 			Отчество препода
 
-			function __construct($idGroup, $numSubGroup, $TitleSubject, $TypeLesson, 
-								$NumberLesson, $DayWeek, $Korpus, $NumberRoom, 
-								$special, $groupName, $employeeID, $prepSurname, 
+			function __construct($idGroup, $numSubGroup, $TitleSubject, $TypeLesson,
+								$NumberLesson, $DayWeek, $Korpus, $NumberRoom,
+								$special, $groupName, $employeeID, $prepSurname,
 								$prepName, $prepSecondName)
 			{
 				$this->idGroup 			= $idGroup;
@@ -98,14 +98,14 @@
 			}
 
 			if (($day == "tomorrow") && ((date("N") == $DayWeek - 1) || ((date("N") == 7) && ($DayWeek == 1)))) {
-				$masLessons[] = new Lesson($idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson, 
-										   $NumberLesson, $DayWeek, $Korpus, $NumberRoom, 
-										   $special, $title, $employee_id, $fam, 
+				$masLessons[] = new Lesson($idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson,
+										   $NumberLesson, $DayWeek, $Korpus, $NumberRoom,
+										   $special, $title, $employee_id, $fam,
 										   $im, $otch);
 			} else if (($day == "today") && (date("N") == $DayWeek)) {
-				$masLessons[] = new Lesson($idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson, 
-										   $NumberLesson, $DayWeek, $Korpus, $NumberRoom, 
-										   $special, $title, $employee_id, $fam, 
+				$masLessons[] = new Lesson($idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson,
+										   $NumberLesson, $DayWeek, $Korpus, $NumberRoom,
+										   $special, $title, $employee_id, $fam,
 										   $im, $otch);
 			}
 		}
@@ -113,7 +113,7 @@
 		$reply = "";
 		$first = false;		// Если первая запись, вывести заголовок расписания
 
-		for ($i = 0; $i < 8; $i++) { 
+		for ($i = 0; $i < 8; $i++) {
 			$find = false;		// есть ли ещё записи на эту же пару (для 2 подгрупп)
 
 			foreach ($masLessons as $lesson) {
@@ -203,7 +203,7 @@
 							$reply .= " <i>(экзамен)</i>\n";
 						}
 					}
-					
+
 					if ($lesson->NumberSubGruop != 0) {
 						$reply .= "---\n<pre>Подгруппа ".$lesson->NumberSubGruop."</pre>\n";
 					}
@@ -214,6 +214,10 @@
 						$reply .= "Корпус: наугорка (11)\n";
 					} elseif ($lesson->Korpus == 12) {
 						$reply .= "Корпус: научка (12)\n";
+					} elseif ($lesson->Korpus == 16) {
+						$reply .= "Корпус: АСИ (16)\n";
+					} else {
+						$reply .= "Корпус: ".$lesson->Korpus."\n";
 					}
 
 					$reply .= "</pre>Препод: <a target=\"_blank\" href=\"http://oreluniver.ru/employee/".$lesson->employeeID."\">".$lesson->prepSurname." ".$lesson->prepName." ".$lesson->prepSecondName."</a>\n\n";
