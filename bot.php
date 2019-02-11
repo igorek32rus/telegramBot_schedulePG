@@ -188,9 +188,16 @@
 			}
 
 			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
+
 		} elseif ($text == "Помощь") {
 
-			$reply = "Это публичная β, так что не судите строго. Есть предложения по улучшению или нашли баг? Пишите <a href='https://t.me/igorek32rus'>сюда</a>.\n\n<b>Команды бота:</b>\n\xE2\x96\xB6 /sd_off - Отключить оповещения с расписанием за час до начала пар;\n\xE2\x96\xB6 /sd_on - Включить оповещения с расписанием за час до начала пар;\n\xE2\x96\xB6 /st_off - Отключить оповещения с расписанием на следующий день;\n\xE2\x96\xB6 /st_on - Включить оповещения с расписанием на следующий день;\n\xE2\x96\xB6 /su_off - Отключить оповещения об изменениях в расписании;\n\xE2\x96\xB6 /su_on - Включить оповещения об изменениях в расписании.";
+			$reply = "Это публичная β, так что не судите строго. Есть предложения по улучшению или нашли баг? Пишите <a href='https://t.me/igorek32rus'>сюда</a>.\n\n";
+			$reply .= "<b>Команды бота:</b>\n";
+			$reply .= "\xE2\x96\xB6 /s Номер_дня_недели - Расписание пар на указанный день недели;\n";
+			$reply .= "\xE2\x96\xB6 /prep Имя_препода - Поиск преподавателя \"Имя_препода\";\n";
+			$reply .= "\xE2\x96\xB6 [/sd_on][/sd_off] - Включить/Отключить оповещения с расписанием за час до начала пар;\n";
+			$reply .= "\xE2\x96\xB6 [/st_on][/st_off] - Включить/Отключить оповещения с расписанием на следующий день;\n";
+			$reply .= "\xE2\x96\xB6 [/su_on][/su_off] - Включить/Отключить оповещения об изменениях в расписании;\n";
 
 			if ($chat_id == $IDadmin) {
 				$reply .= "\n\n<b>КОМАНДЫ АДМИНА:</b>\n\xE2\x9A\xA1 /admin [сообщение] - сообщение от админа в чат;\n\xE2\x9A\xA1 /users - список пользователей бота;\n\xE2\x9A\xA1 /whois [chat_id] - инфа о пользователе с chat_id;\n\xE2\x9A\xA1 /log - вывод последних 10 действий с ботом.";
@@ -255,7 +262,7 @@
 					$count = 0;
 					while ($row = $stmt->fetch())	// Рассылаем всем сообщение от админа
 					{
-						$textMessage .= "<a href=\"http://oreluniver.ru/employee/".$row['db_id']."\">".$row['fio']."</a>\n";
+						$textMessage .= "\xE2\x96\xAA <a href=\"http://oreluniver.ru/employee/".$row['db_id']."\">".$row['fio']."</a>\n";
 						$count++;
 					}
 
@@ -309,6 +316,19 @@
 				}
 				/********************************************/
 			}
+
+		} elseif ((stripos($text, "/s ") !== false) && (stripos($text, "/s ") == 0)) {
+
+			$reply = substr($text, 3);		// Убираем из текста "/s "
+
+			$time = "";
+			$reply = Schedule($reply, $time);
+
+			if ($reply == "error") {
+				$reply = "Ошибка!";
+			}
+
+			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
 
 		} else {
 			$reply = "По запросу \"<b>".$text."</b>\" ничего не найдено.";

@@ -107,6 +107,11 @@
 										   $NumberLesson, $DayWeek, $Korpus, $NumberRoom,
 										   $special, $title, $employee_id, $fam,
 										   $im, $otch);
+			} else if ($day == $DayWeek) {		// Для указанного дня недели
+				$masLessons[] = new Lesson($idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson,
+										   $NumberLesson, $DayWeek, $Korpus, $NumberRoom,
+										   $special, $title, $employee_id, $fam,
+										   $im, $otch);
 			}
 		}
 
@@ -149,6 +154,34 @@
 						} else if ($day == "today") {
 							$reply .= "<strong>Расписание пар на сегодня (".$TextDayWeek.")</strong>\n";
 							$reply .= "<b>\xE2\x9A\xA0 Сегодня к ".$lesson->NumberLesson." паре ";
+						} else if (($day > 0) && ($day < 7)) {
+
+							switch ($lesson->DayWeek) {
+								case 1:
+									$TextDayWeek = "понедельник";
+									break;
+								case 2:
+									$TextDayWeek = "вторник";
+									break;
+								case 3:
+									$TextDayWeek = "среду";
+									break;
+								case 4:
+									$TextDayWeek = "четверг";
+									break;
+								case 5:
+									$TextDayWeek = "пятницу";
+									break;
+								case 6:
+									$TextDayWeek = "субботу";
+									break;
+								default:
+									# code...
+									break;
+							}
+
+							$reply .= "<strong>Расписание пар на ".$TextDayWeek."</strong>\n";
+							$reply .= "<b>\xE2\x9A\xA0 В ".$TextDayWeek." к ".$lesson->NumberLesson." паре ";
 						}
 
 						$reply .= "(";
@@ -220,7 +253,7 @@
 						$reply .= "Корпус: ".$lesson->Korpus."\n";
 					}
 
-					$reply .= "</pre>Препод: <a target=\"_blank\" href=\"http://oreluniver.ru/employee/".$lesson->employeeID."\">".$lesson->prepSurname." ".$lesson->prepName." ".$lesson->prepSecondName."</a>\n\n";
+					$reply .= "</pre>Препод: <a target=\"_blank\" href=\"http://oreluniver.ru/employee/".$lesson->employeeID."\">".$lesson->prepSurname." ".$lesson->prepName." ".$lesson->prepSecondName."</a>\n";
 
 					$find = true;
 				}
