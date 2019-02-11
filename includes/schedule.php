@@ -253,7 +253,7 @@
 						$reply .= "Корпус: ".$lesson->Korpus."\n";
 					}
 
-					$reply .= "</pre>Препод: <a target=\"_blank\" href=\"http://oreluniver.ru/employee/".$lesson->employeeID."\">".$lesson->prepSurname." ".$lesson->prepName." ".$lesson->prepSecondName."</a>\n";
+					$reply .= "</pre>Препод: <a target=\"_blank\" href=\"http://oreluniver.ru/employee/".$lesson->employeeID."\">".$lesson->prepSurname." ".$lesson->prepName." ".$lesson->prepSecondName."</a>\n\n";
 
 					$find = true;
 				}
