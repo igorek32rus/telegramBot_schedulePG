@@ -244,7 +244,7 @@
 			$textMessage = $text;
 			$textMessage = substr($textMessage, 6);		// Убираем из текста "/prep "
 
-			if (mb_strlen($textMessage) >= 3) {
+			if (mb_strlen($textMessage) > 3) {
 				// To DB
 				try {
 					include("includes/settings.php");			// Подключаем настройки
@@ -277,7 +277,7 @@
 				}
 				/********************************************/
 			} else {
-				$textMessage = "Ошибка! Минимальное количество символов для поиска - 3.";
+				$textMessage = "Ошибка! Количество символов для поиска должно быть больше 3.";
 			}
 
 			$reply = $textMessage;
