@@ -159,7 +159,7 @@
 						$reply .= "\nВот сохранённое расписание, пока сайт лежит...\n\n";
 						$reply .= $history;
 					} else {
-						$reply = "Ошибка!";
+						$reply .= "\nСохранённого расписания пока тоже нет!";
 					}
 				}
 			}
@@ -181,7 +181,7 @@
 						$reply .= "\nВот сохранённое расписание, пока сайт лежит...\n\n";
 						$reply .= $history;
 					} else {
-						$reply = "Ошибка!";
+						$reply .= "\nСохранённого расписания пока тоже нет!";
 					}
 				}
 
@@ -325,7 +325,7 @@
 			$reply = Schedule($reply, $time);
 
 			if ($reply == "error") {
-				$reply = "Ошибка!";
+				$reply = "Ошибка! Расписание на указанный день отсутствует.";
 			}
 
 			$telegram->sendMessage([ 'chat_id' => $chat_id, 'parse_mode' => 'HTML', 'disable_web_page_preview' => true, 'text' => $reply ]);
