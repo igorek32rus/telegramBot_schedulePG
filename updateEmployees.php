@@ -65,10 +65,18 @@
     $sql = substr($sql, 0, -2);
     $sql .= ";";
 
-    echo $sql;
+    //echo $sql;
 
     $stm = $dbh->prepare($sql);
     $stm->execute($values);
+
+    // Пишем в лог
+    date_default_timezone_set('Etc/GMT-3');
+    $date_time = date("d.m.y H:i:s");
+    $sql = "INSERT INTO log SET user_id='0', date_time='".$date_time."', action='Обновление преподов'";
+    $stm = $dbh->prepare($sql);
+    $stm->execute($values);
+
     $dbh = null;
     unset($dbh);
     unset($html);

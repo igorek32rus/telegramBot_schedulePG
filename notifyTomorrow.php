@@ -3,15 +3,15 @@
 
 	mb_internal_encoding('UTF-8');
 	mb_http_output('UTF-8');
-	
+
 	include("includes/settings.php");
 	include("includes/schedule.php");
 
 	include('vendor/autoload.php'); //Подключаем библиотеку
-	use Telegram\Bot\Api; 
+	use Telegram\Bot\Api;
 
 	$telegram = new Api($BotToken); //Устанавливаем токен, полученный у BotFather
-	
+
 	$time = "";
 	$reply = Schedule("tomorrow", $time);
 
@@ -19,12 +19,12 @@
 	if (date("N") != 6) {
 		$send = true;
 	}
-	
+
 	if (($reply != "error") && ($send)) {
 		// To DB
 		try {
 			$dbh = new PDO("mysql:host=".$DBhost.";dbname=".$DBname.";charset=utf8mb4", $DBuser, $DBpass);
-			
+
 			$sql = "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_general_ci'";
 			$stm = $dbh->prepare($sql);
 			$stm->execute($values);
@@ -64,7 +64,7 @@
 				$stmt->closeCursor();
 			}
 
-			
+
 			$dbh = null;
 		} catch (PDOException $e) {
 			print "Error!: " . $e->getMessage() . "<br/>";
@@ -72,5 +72,29 @@
 		}
 		/********************************************/
 	}
-	
+
+	if ($reply == "error") {
+		// To DB
+		try {
+			$dbh = new PDO("mysql:host=".$DBhost.";dbname=".$DBname.";charset=utf8mb4", $DBuser, $DBpass);
+
+			$sql = "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_general_ci'";
+			$stm = $dbh->prepare($sql);
+			$stm->execute($values);
+
+			// Пишем в лог
+			date_default_timezone_set('Etc/GMT-3');
+			$date_time = date("d.m.y H:i:s");
+			$sql = "INSERT INTO log SET user_id='0', date_time='".$date_time."', action='Ежедневная рассылка расписания на завтра. Расписание отсутствует!'";
+			$stm = $dbh->prepare($sql);
+			$stm->execute($values);
+
+			$dbh = null;
+		} catch (PDOException $e) {
+			print "Error!: " . $e->getMessage() . "<br/>";
+			die();
+		}
+		/********************************************/
+	}
+
 ?>
