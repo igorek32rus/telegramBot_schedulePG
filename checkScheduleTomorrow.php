@@ -17,7 +17,7 @@
 		$stm = $dbh->prepare($sql);
 		$stm->execute($values);
 
-			
+
 		$stmt = $dbh->query("SELECT val FROM settings WHERE type=\"now_date\"");
 		while ($row = $stmt->fetch()) {
 			$text = $row['val'];
@@ -32,7 +32,7 @@
 				$stm->execute($values);
 			}
 		}
-			
+
 		$dbh = null;
 	} catch (PDOException $e) {
 		print "Error!: " . $e->getMessage() . "<br/>";
@@ -50,16 +50,16 @@
 
 	try {
 		$dbh = new PDO("mysql:host=".$DBhost.";dbname=".$DBname.";charset=utf8mb4", $DBuser, $DBpass);
-			
+
 		$sql = "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_general_ci'";
 		$stm = $dbh->prepare($sql);
 		$stm->execute($values);
 
-		$stmt = $dbh->query("SELECT text FROM history WHERE day=\"today\"");
+		$stmt = $dbh->query("SELECT text FROM history WHERE day=\"tomorrow\"");
 		while ($row = $stmt->fetch()) {
 			$DB_key_tomorrow = $row['text'];
 		}
-		
+
 		$stmt->closeCursor();
 
 		$dbh = null;
@@ -68,7 +68,7 @@
 		die();
 	}
 	/********************************************/
-	
+
 	if ($MD5_Schedule_tomorrow != $DB_key_tomorrow) {
 		if ($schedule_tomorrow == "error") {		// Пришёл error
 			if ((date("G") == 23) || (date("G") == 0)) {	// Время 23-1
@@ -118,7 +118,7 @@
 					$sql = "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_general_ci'";
 					$stm = $dbh->prepare($sql);
 					$stm->execute($values);
-		
+
 					$stmt = $dbh->query('SELECT * FROM users');
 
 					$mas_users = array();
@@ -150,11 +150,11 @@
 					print "Error!: " . $e->getMessage() . "<br/>";
 					die();
 				}
-				/********************************************/			
+				/********************************************/
 			}
 		}
 	}
 
 	/***************** КОНЕЦ РАСПИСАНИЯ НА ЗАВТРА *****************/
-	
+
 ?>

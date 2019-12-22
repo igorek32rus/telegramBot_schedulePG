@@ -15,8 +15,11 @@
 
 		//$date = 1545004800889;
 
-		$content = file_get_contents("http://oreluniver.ru/schedule//{$IDgroup}///{$date}/printschedule");
+		$default_socket_timeout = ini_get('default_socket_timeout');		// сохраняем время ожидания (исхоное)
+		ini_set('default_socket_timeout', 10);		// меняем на 10 сек
 
+		$content = file_get_contents("http://oreluniver.ru/schedule//{$IDgroup}///{$date}/printschedule");
+		ini_set('default_socket_timeout', $default_socket_timeout);		// восстанавливаем
 		//echo $content."<br>";
 
 		$obj = json_decode($content);
@@ -201,6 +204,15 @@
 								break;
 							case 5:
 								$time = "15:20";
+								break;
+							case 6:
+								$time = "17:00";
+								break;
+							case 7:
+								$time = "18:40";
+								break;
+							case 8:
+								$time = "20:15";
 								break;
 							default:
 								$time = "";
