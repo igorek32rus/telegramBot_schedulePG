@@ -59,11 +59,12 @@
 			public $link = "";							// link 				ссылка на конференцию ДОТ
 			public $pass = "";							// pass 				пароль для конференции ДОТ
 
-			function __construct($idGroup, $numSubGroup, $TitleSubject, $TypeLesson,
+			function __construct($id_cell, $idGroup, $numSubGroup, $TitleSubject, $TypeLesson,
 								$NumberLesson, $DayWeek, $Korpus, $NumberRoom,
 								$special, $groupName, $employeeID, $prepSurname,
 								$prepName, $prepSecondName, $link, $pass)
 			{
+				$this->id_cell 			= $id_cell;
 				$this->idGroup 			= $idGroup;
 				$this->NumberSubGruop 	= $numSubGroup;
 				$this->TitleSubject 	= $TitleSubject;
@@ -89,6 +90,7 @@
 		foreach ($obj as $eventrType => $events) {
 			foreach ($events as $event => $val) {
 				//echo "{$event}: {$val}<br>";
+				if ($event == 'id_cell') $id_cell = $val;
 				if ($event == 'idGruop') $idGruop = $val;
 				if ($event == 'NumberSubGruop') $NumberSubGruop = $val;
 				if ($event == 'TitleSubject') $TitleSubject = $val;
@@ -109,17 +111,17 @@
 			}
 
 			if (($day == "tomorrow") && ((date("N") == $DayWeek - 1) || ((date("N") == 7) && ($DayWeek == 1)))) {
-				$masLessons[] = new Lesson($idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson,
+				$masLessons[] = new Lesson($id_cell, $idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson,
 										   $NumberLesson, $DayWeek, $Korpus, $NumberRoom,
 										   $special, $title, $employee_id, $fam,
 										   $im, $otch, $link, $pass);
 			} else if (($day == "today") && (date("N") == $DayWeek)) {
-				$masLessons[] = new Lesson($idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson,
+				$masLessons[] = new Lesson($id_cell, $idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson,
 										   $NumberLesson, $DayWeek, $Korpus, $NumberRoom,
 										   $special, $title, $employee_id, $fam,
 										   $im, $otch, $link, $pass);
 			} else if ($day == $DayWeek) {		// Для указанного дня недели
-				$masLessons[] = new Lesson($idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson,
+				$masLessons[] = new Lesson($id_cell, $idGruop, $NumberSubGruop, $TitleSubject, $TypeLesson,
 										   $NumberLesson, $DayWeek, $Korpus, $NumberRoom,
 										   $special, $title, $employee_id, $fam,
 										   $im, $otch, $link, $pass);
@@ -262,30 +264,31 @@
 					}
 
 					if ($lesson->TypeLesson == "лек") {
-						$reply .= "<pre>Дистанционка\n";
+						$reply .= "<pre>\xF0\x9F\x93\x8D Дистанционка</pre>\n";
 						if ($lesson->link != "") {
-							$reply .= "Конференция: </pre><a target=\"_blank\" href=\"".$lesson->link."\">ссылка</a>\n";
+							$reply .= " - Конференция: <a target=\"_blank\" href=\"".$lesson->link."\">ссылка</a>\n";
 							if ($lesson->pass != "") {
-								$reply .= "<pre>Пароль: ".$lesson->pass."\n";
+								$reply .= " - Пароль: ".$lesson->pass."\n";
 							}
 						}
 					} else {
-						$reply .= "<pre>Аудитория: ".$lesson->NumberRoom."\n";
-
+						$reply .= "<pre>\xF0\x9F\x93\x8D ";
 						if ($lesson->Korpus == 11) {
-							$reply .= "Корпус: наугорка (11)\n";
+							$reply .= "Наугорка (11) | ";
 						} elseif ($lesson->Korpus == 12) {
-							$reply .= "Корпус: научка (12)\n";
+							$reply .= "Научка (12) | ";
 						} elseif ($lesson->Korpus == 16) {
-							$reply .= "Корпус: АСИ (16)\n";
+							$reply .= "АСИ (16) | ";
 						} else {
 							$reply .= "Корпус: ".$lesson->Korpus."\n";
 						}
+
+						$reply .= "к. ".$lesson->NumberRoom."</pre>\n";
 					}
 
-					$reply .= "</pre>";
+					$reply .= "\xF0\x9F\x93\x96 <a target=\"_blank\" href=\"http://oreluniver.ru/schedule/file?idCell=".$lesson->id_cell."\">Методические мат-лы</a>\n";
 
-					$reply .= "Препод: <a target=\"_blank\" href=\"http://oreluniver.ru/employee/".$lesson->employeeID."\">".$lesson->prepSurname." ".$lesson->prepName." ".$lesson->prepSecondName."</a>\n\n";
+					$reply .= "\xF0\x9F\x91\xA4 <a target=\"_blank\" href=\"http://oreluniver.ru/employee/".$lesson->employeeID."\">".$lesson->prepSurname." ".$lesson->prepName." ".$lesson->prepSecondName."</a>\n\n";
 
 					$find = true;
 				}
